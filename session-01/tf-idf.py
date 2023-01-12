@@ -3,7 +3,7 @@ from collections import defaultdict
 from numpy import log10, sqrt
 
 def gather_20newsgroups_data():
-    path = 'D:/Education/HUST/dslab-706/session-01/datasets/20news-bydate/'
+    path = 'D:/Education/HUST/dslab-706/dslab-training/session-01/datasets/20news-bydate/'
     # add path to subfolders only, not existing files in path
     dirs = [path + dir_name + '/' for dir_name in os.listdir(path) if not os.path.isfile(path + dir_name)]
     # assign name train_dir and test_dir to "path to subfolders"
@@ -13,7 +13,7 @@ def gather_20newsgroups_data():
     list_newsgroups = [newsgroups for newsgroups in os.listdir(train_dir)]
     list_newsgroups.sort()
 
-    with open('D:/Education/HUST/dslab-706/session-01/datasets/stop_words.txt') as f:
+    with open('D:/Education/HUST/dslab-706/dslab-training/session-01/datasets/stop_words.txt') as f:
         # read from stop_words.txt file to get list of stop words
         stop_words = f.read().splitlines()
 
@@ -50,11 +50,11 @@ def gather_20newsgroups_data():
 
     full_data = train_data + test_data
     # export data into a txt file, each news file corresponding to a line
-    with open('D:/Education/HUST/dslab-706/session-01/datasets/20news-bydate/20news-bydate-train-processed.txt', 'w') as f:
+    with open('D:/Education/HUST/dslab-706/session-01/dslab-training/datasets/20news-bydate/20news-bydate-train-processed.txt', 'w') as f:
         f.write('\n'.join(train_data))
-    with open('D:/Education/HUST/dslab-706/session-01/datasets/20news-bydate/20news-bydate-test-processed.txt', 'w') as f:
+    with open('D:/Education/HUST/dslab-706/session-01/dslab-training/datasets/20news-bydate/20news-bydate-test-processed.txt', 'w') as f:
         f.write('\n'.join(test_data))
-    with open('D:/Education/HUST/dslab-706/session-01/datasets/20news-bydate/20news-bydate-full-processed.txt', 'w') as f:
+    with open('D:/Education/HUST/dslab-706/session-01/dslab-training/datasets/20news-bydate/20news-bydate-full-processed.txt', 'w') as f:
         f.write('\n'.join(full_data))
 
 def generate_vocabulary(data_path):
@@ -84,12 +84,12 @@ def generate_vocabulary(data_path):
     words_idfs.sort(key = lambda t: t[1], reverse = True)
     print("Vocabulary size:",len(words_idfs))
     
-    with open('D:/Education/HUST/dslab-706/session-01/datasets/20news-bydate/words-idfs.txt', 'w') as f:
+    with open('D:/Education/HUST/dslab-706/dslab-training/session-01/datasets/20news-bydate/words-idfs.txt', 'w') as f:
         # export to a txt file, with each line being a word and its idf (inverse document frequency)
         f.write('\n'.join([word + '<fff>' + str(idf) for word, idf in words_idfs]))
 
 def get_tf_idf(data_path):
-    with open('D:/Education/HUST/dslab-706/session-01/datasets/20news-bydate/words-idfs.txt') as f:
+    with open('D:/Education/HUST/dslab-706/dslab-training/session-01/datasets/20news-bydate/words-idfs.txt') as f:
         # return list or tuples of the form (word, inverse-document-frequency of word)
         words_idfs = [(line.split('<fff>')[0], float(line.split('<fff>')[1])) for line in f.read().splitlines()]
         # dictionary where key is the word and value is associated index - for simpler look-up - each word in total dictionary gets an ID
@@ -127,18 +127,18 @@ def get_tf_idf(data_path):
         sparse_rep = ' '.join(document_tf_idfs_normalized)
         data_tf_idf.append((label, doc_id, sparse_rep))
 
-    with open('D:/Education/HUST/dslab-706/session-01/datasets/20news-bydate/data-tf-idf.txt', 'w') as f:
+    with open('D:/Education/HUST/dslab-706/dslab-training/session-01/datasets/20news-bydate/data-tf-idf.txt', 'w') as f:
         # export to a txt file, with each line being a document: news group, file name, tf-idf vector
         f.write('\n'.join(str(label) + '<fff>' + str(doc_id) + '<fff>' + sparse_rep for label, doc_id, sparse_rep in data_tf_idf))
 
 def main():
-    #generate_vocabulary("D:/Education/HUST/dslab-706/session-01/datasets/20news-bydate/20news-bydate-train-processed.txt")
-    #generate_vocabulary("D:/Education/HUST/dslab-706/session-01/datasets/20news-bydate/20news-bydate-test-processed.txt")
-    generate_vocabulary("D:/Education/HUST/dslab-706/session-01/datasets/20news-bydate/20news-bydate-full-processed.txt")
+    generate_vocabulary("D:/Education/HUST/dslab-706/dslab-training/session-01/datasets/20news-bydate/20news-bydate-train-processed.txt")
+    #generate_vocabulary("D:/Education/HUST/dslab-706/dslab-training/session-01/datasets/20news-bydate/20news-bydate-test-processed.txt")
+    #generate_vocabulary("D:/Education/HUST/dslab-706/dslab-training/session-01/datasets/20news-bydate/20news-bydate-full-processed.txt")
 
-    #get_tf_idf("D:/Education/HUST/dslab-706/session-01/datasets/20news-bydate/20news-bydate-train-processed.txt")
-    #get_tf_idf("D:/Education/HUST/dslab-706/session-01/datasets/20news-bydate/20news-bydate-test-processed.txt")
-    get_tf_idf("D:/Education/HUST/dslab-706/session-01/datasets/20news-bydate/20news-bydate-full-processed.txt")
+    get_tf_idf("D:/Education/HUST/dslab-706/dslab-training/session-01/datasets/20news-bydate/20news-bydate-train-processed.txt")
+    #get_tf_idf("D:/Education/HUST/dslab-706/dslab-training/session-01/datasets/20news-bydate/20news-bydate-test-processed.txt")
+    #get_tf_idf("D:/Education/HUST/dslab-706/dslab-training/session-01/datasets/20news-bydate/20news-bydate-full-processed.txt")
 
 if __name__ == '__main__':
     main()
