@@ -1,6 +1,9 @@
 from collections import defaultdict
 import numpy as np
 import random
+import os
+
+cwd = os.getcwd()
 
 class Member:
     def __init__(self, rd, label=None, doc_id=None):
@@ -23,12 +26,12 @@ class Kmeans:
     # self._num_clusters: int: number of clusters
     # self._clusters: list: list of all Clusters (class)
     # self._centroids: list: list of all centroids
-    # self._S: float: overall clustering error
+    # self._S float: overall clustering error
     def __init__(self, num_clusters):
         self._num_clusters = num_clusters
         self._clusters = [Cluster() for _ in range(self._num_clusters)]
         self._centroids = [] # list of centroids
-        self._similarity = 0 # overall similarity
+        self._S = 0 # overall similarity
     
     # self._data: list: all data/members. Member._rd: 1D np array
     # self._label_count: dict: number of files per news group
@@ -46,7 +49,7 @@ class Kmeans:
         with open(data_path) as fp:
             # corpus, each file with its label + doc_id + tf-idf (sparse) vector. vector ~ document
             corpus_rd = fp.read().splitlines() 
-        with open('D:/Education/HUST/dslab-706/dslab-training/session-02/words-idfs.txt') as fp:
+        with open(cwd + '\\words-idfs.txt') as fp:
             # vocab of entire corpus
             vocab_size = len(fp.read().splitlines()) 
         
@@ -146,6 +149,6 @@ class Kmeans:
                 break
 
 Kmeans_3 = Kmeans(3)
-Kmeans_3.load_data('D:/Education/HUST/dslab-706/dslab-training/session-02/data-tf-idf.txt')
+Kmeans_3.load_data(cwd + '\\data-tf-idf.txt')
 Kmeans_3.run(1, 'max_iters', 10)
 print(Kmeans_3._clusters)
