@@ -3,8 +3,6 @@ import numpy as np
 import random
 import os
 
-cwd = os.getcwd()
-
 class Member:
     def __init__(self, rd, label=None, doc_id=None):
         self._rd = rd
@@ -26,7 +24,7 @@ class Kmeans:
     # self._num_clusters: int: number of clusters
     # self._clusters: list: list of all Clusters (class)
     # self._centroids: list: list of all centroids
-    # self._S float: overall clustering error
+    # self._S: float: overall cluster similarity
     def __init__(self, num_clusters):
         self._num_clusters = num_clusters
         self._clusters = [Cluster() for _ in range(self._num_clusters)]
@@ -49,7 +47,7 @@ class Kmeans:
         with open(data_path) as fp:
             # corpus, each file with its label + doc_id + tf-idf (sparse) vector. vector ~ document
             corpus_rd = fp.read().splitlines() 
-        with open(cwd + '\\words-idfs.txt') as fp:
+        with open('words-idfs.txt') as fp:
             # vocab of entire corpus
             vocab_size = len(fp.read().splitlines()) 
         
@@ -147,8 +145,42 @@ class Kmeans:
             self._iteration += 1
             if self.stopping_condition(criterion, threshold) == True:
                 break
+    
+    def compute_purity(self):
+        majority_sum = 0
+        for cluster in self._clusters:
+            member_labels = [member._label for member in cluster._members]
+            max_count = max([member_labels.count(label) for label in range(20)])
+            majority_sum += max_count
+        return majority_sum * 1/len(self._data)
+    
+    def compute_NMI(self):
+        I_value, H_omega, H_C, N = 0, 0, 0, len(self._data)
+        for cluster in self._clusters:
+            wk = len(cluster._members)
+            H_omega += -wk/N * np.log10(wk/N)
+            # labels of members within a cluster
+            member_labels = [member._label for member in cluster._members]
+            for label in range(20):
+                # number of members within a cluster with a particular label
+                wk_cj = member_labels.count(label)
+                # number of members in the entire data with a particular label
+                cj = self._label_count[label]
+                I_value += wk_cj/N * np.log10(N * wk_cj / (wk * cj) + 1e-12)
+        for label in range(20):
+            cj = self._label_count[label]
+            H_C += -cj/N * np.log10(cj/N)
+        return I_value * 2 / (H_omega + H_C)
 
-Kmeans_3 = Kmeans(3)
-Kmeans_3.load_data(cwd + '\\data-tf-idf.txt')
-Kmeans_3.run(1, 'max_iters', 10)
-print(Kmeans_3._clusters)
+# testing
+def main():
+    for seed in range(1,4):
+        KM = Kmeans(10)
+        KM.load_data('data-tf-idf.txt')
+        KM.run(seed, 'max_iters', 20)
+        print("seed:", seed)
+        print("purity:", KM.compute_purity())
+        print("nmi:", KM.compute_NMI())
+
+if __name__ == '__main__':
+    main()
